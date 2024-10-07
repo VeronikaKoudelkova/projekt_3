@@ -21,7 +21,7 @@ soup = BeautifulSoup(server_answer.text, 'html.parser')
 #print(soup)
 
 
-table_tag = soup.find("div", {"id": "inner"})
+table_tag = soup.find("div", {"id": "core"})
 #print(type(table_tag))
 all_tr = table_tag.find_all("tr")
 
@@ -29,15 +29,16 @@ all_tr = table_tag.find_all("tr")
 #print(all_tr)
 
 
-def scraping_of_election_results(tr_tags) -> list:
+def scraping_of_election_results(tr_tags: "bs4.element.ResultSet") -> list:
 
-    
-    RESULTS_1 = []
+
+    RESULTS = []            # finalni vysledky
+    RESULTS_1 = []          # list, kam se iterovanim postupne pridavaji obce se vsemi vysledky z listu "RESULTS_2"
 
 
     for tr in tr_tags[2:-1]:
 
-        RESULTS_2 = []
+        RESULTS_2 = []      # list, kam se ukladaji obce se vsemi vysledky
 
 
         #print(tr)
@@ -51,7 +52,7 @@ def scraping_of_election_results(tr_tags) -> list:
                 "CODE": td_on_the_row[0].get_text(),
                 "LOCATION": td_on_the_row[1].get_text(),
             } 
-            print("CODE AND LOCATION:", code_and_location)
+            #print("CODE AND LOCATION:", code_and_location)
 
 
             url_election_returns = tr.find("a")                                                                 
@@ -62,7 +63,7 @@ def scraping_of_election_results(tr_tags) -> list:
     
             server_answer_municipality = requests.get(url_election_link)
             soup_municipality = BeautifulSoup(server_answer_municipality.text, 'html.parser' )
-            table_tag_municipality = soup_municipality.find("div", {"id": "content"})
+            table_tag_municipality = soup_municipality.find("div", {"id": "core"})
             #print(table_tag_municipality)
             #print(type(table_tag_municipality))
             all_tr_municipality = table_tag_municipality.find_all("tr")
@@ -99,7 +100,7 @@ def scraping_of_election_results(tr_tags) -> list:
                 results_each_municipality.append({election_results_party: election_results_vote})
                 
 
-            # FILTROVANI VYSLEDKY, ODSTRANENI HODNOT NONE
+            # FILTROVANI VYSLEDKU - ODSTRANENI HODNOT "NONE"
             filtered_results_each_municipality_1 = list(filter(None, results_each_municipality))
             #print("FILTERED 1:", filtered_results_each_municipality_1)
             filtered_results_each_municipality_2 = []
@@ -113,27 +114,39 @@ def scraping_of_election_results(tr_tags) -> list:
                 
             # SLOUCENI DO JEDNOHO SLOVNIKU
 
-            MERGED_DICTIONARIES = dict()
+            MERGED_DICTIONARIES = dict()                # ukladani sloucenych slovniku s vysledky pro kazdou obec
 
             for i in range(0, len(filtered_results_each_municipality_2)):
                 code_and_location.update(filtered_results_each_municipality_2[i])
-                MERGED_DICTIONARIES.update(code_and_location)
+                MERGED_DICTIONARIES.update(code_and_location)               # slouceni slovniku, kde je ulozeny kod a obec se slovnikem s vysledky pro kazdou obec
             
             #print("MERGED DICT:", MERGED_DICTIONARIES)
             RESULTS_2.append(MERGED_DICTIONARIES)
-            #print("RESULTS_2:", RESULTS_2)
+            #print("RESULTS_2:", RESULTS_2)                 # list "RESULTS_2" obsahuje seznam slovniku, kde v kazdem slovniku je ulozena obec s vysledky
 
             break
             
         
         for result in RESULTS_2:
-            print("result:", result)
-            RESULTS_1.append(result)
+            #print("result:", result)
+            RESULTS_1.append(result)                        # vsechny obce v jednom listu, postupne pridavani iteraci
+             
+        #print("RESULTS_1:", RESULTS_1)
+        #print(len(RESULTS_1))
+
+        for result in RESULTS_1:                           # pridani posledni iterace, kde jsou v listu vsechny obce se vsemi vysledky do finalniho listu "RESULTS"
+            if len(RESULTS_1) == 94:                       # pocet obci je 94
+                RESULTS.append(result)
+            #print("RESULTS:", RESULTS)
+            #print(bool(RESULTS))
     
-            print("RESULTS_1:", RESULTS_1)      # POKUD POSUNU return JESTE O JEDEN TABULATOR, VRACI SE MI VYSLEDKY JEN PRO BEHAROV..
-                                                    # POKUD VSAK NECHAM return ZDE, DOSTANU CHYBU AttributeError
-                                    
-    
+        if (bool(RESULTS)) == True:                        # vrat neprazny list se vsemi vysledky
+
+            return RESULTS
+
+
+                           
+
 
     
 
