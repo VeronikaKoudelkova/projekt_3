@@ -11,7 +11,7 @@
     * knihovny, které jsou pro spuštění programu potřeba: bs4, BeautifulSoup, první nainstalujeme v terminálu tedy pomocí příkazu: pip3 install bs4
 
 * Balíčky potřebné pro běh programu jsou uvedeny pod úvodní hlavičkou přímo v kódu.
-* Kód programu se skládá celkem ze 7 funkcí.
+* Kód programu se skládá celkem z 10 funkcí.
 * Program se spouští pomocí 2 argumentů, které je potřeba zadat na konci kódu do proměnné 'vysledky' 
     * prvním argumentem je odkaz na územní celek Klatovy: <https://volby.cz/pls/ps2017nss/ps32?xjazyk=CZ&xkraj=4&xnumnuts=3202> v datovém typu str()
     * druhým argumentem je výstupní soubor s příponou .csv: 'VYSLEDKY_KLATOVY.csv'
